@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from example_interfaces.srv import AddTwoInts
 
 import rclpy
@@ -33,20 +35,14 @@ class MinimalClientAsync(Node):
         self.future = self.cli.call_async(self.req)
 
 
-def main(args=None):
-    rclpy.init(args=args)
+def main():
+    rclpy.init()
 
     minimal_client = MinimalClientAsync()
-    minimal_client.send_request()
-
-    while rclpy.ok():
-        rclpy.spin_once(minimal_client)
-        if minimal_client.future.done():
-            response = minimal_client.future.result()
-            minimal_client.get_logger().info(
-                'Result of add_two_ints: for %d + %d = %d' %
-                (minimal_client.req.a, minimal_client.req.b, response.sum))
-            break
+    response = minimal_client.send_request(int(sys.argv[1]), int(sys.argv[2]))
+    minimal_client.get_logger().info(
+        'Result of add_two_ints: for %d + %d = %d' %
+        (int(sys.argv[1]), int(sys.argv[2]), response.sum))
 
     minimal_client.destroy_node()
     rclpy.shutdown()
