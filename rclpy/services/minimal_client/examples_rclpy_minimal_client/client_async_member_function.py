@@ -29,10 +29,12 @@ class MinimalClientAsync(Node):
             self.get_logger().info('service not available, waiting again...')
         self.req = AddTwoInts.Request()
 
-    def send_request(self):
-        self.req.a = 41
-        self.req.b = 1
+    def send_request(self, a, b):
+        self.req.a = a
+        self.req.b = b
         self.future = self.cli.call_async(self.req)
+        rclpy.spin_until_future_complete(self, self.future)
+        return self.future.result()
 
 
 def main():
